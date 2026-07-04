@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RSA Hamming-3 Exponents — Technical Documentation</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3em 2.5em;
+    background: #fafaf7;
+    color: #1a1a1a;
+    line-height: 1.75;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  header {
+    text-align: center;
+    padding-bottom: 2em;
+    margin-bottom: 3em;
+    border-bottom: 2px solid #2a2a2a;
+  }
+  header h1 {
+    font-size: 2em;
+    font-weight: normal;
+    letter-spacing: .02em;
+    margin: 0 0 .6em 0;
+    color: #111;
+    line-height: 1.3;
+  }
+  header .subtitle {
+    font-variant: small-caps;
+    letter-spacing: .08em;
+    color: #3a3a3a;
+    font-size: 1em;
+    margin-bottom: .4em;
+  }
+  header .date {
+    font-style: italic;
+    color: #6a6a6a;
+    font-size: .92em;
+  }
+  .abstract {
+    background: #f1efe9;
+    border: 1px solid #c9c4b8;
+    padding: 1.5em 1.8em;
+    margin-bottom: 2.5em;
+  }
+  .abstract h2 {
+    font-variant: small-caps;
+    letter-spacing: .1em;
+    font-size: 1em;
+    margin: 0 0 .6em 0;
+    color: #3a3a3a;
+    border: none;
+    padding: 0;
+    text-transform: none;
+  }
+  .abstract p { margin: 0; font-size: .95em; text-align: justify; }
+  .keywords { margin-top: 1em; font-size: .88em; color: #555; }
+  .keywords strong { font-variant: small-caps; letter-spacing: .08em; }
+  h2 {
+    font-size: 1.3em; font-weight: normal; letter-spacing: .04em;
+    text-transform: uppercase; color: #1a1a1a; margin-top: 2.8em;
+    margin-bottom: 1em; padding-bottom: .35em; border-bottom: 1px solid #b8b3a5;
+  }
+  h3 {
+    font-size: 1.08em; font-weight: bold; color: #2a2a2a;
+    margin-top: 1.8em; margin-bottom: .6em;
+  }
+  p { text-align: justify; margin: 0 0 1.1em 0; hyphens: auto; }
+  ul, ol { margin: .6em 0 1.2em 1.6em; padding: 0; }
+  li { margin-bottom: .45em; }
+  code {
+    font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+    background: #ececea; padding: 1px 6px; border-radius: 2px;
+    font-size: .9em; color: #2a2a2a;
+  }
+  pre {
+    background: #ececea; border: 1px solid #c9c4b8; padding: 1em 1.2em;
+    font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+    font-size: .88em; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;
+    margin: 1.4em 0;
+  }
+  table {
+    border-collapse: collapse; width: 100%; margin: 1.4em 0; font-size: .93em;
+  }
+  caption {
+    font-style: italic; font-size: .92em; color: #555; margin-bottom: .6em;
+    text-align: left; caption-side: top;
+  }
+  th, td { border: 1px solid #b8b3a5; padding: .55em .9em; text-align: left; }
+  th {
+    background: #3a3a3a; color: #fafaf7; font-weight: normal;
+    letter-spacing: .04em; text-transform: uppercase; font-size: .85em;
+  }
+  tr:nth-child(even) { background: #f1efe9; }
+  .nota {
+    background: #f1efe9; border-left: 3px solid #8a8474; padding: .85em 1.3em;
+    margin: 1.4em 0; font-size: .95em;
+  }
+  .nota strong { font-variant: small-caps; letter-spacing: .06em; color: #3a3a3a; }
+  .referencias { font-size: .92em; }
+  .referencias ol { padding-left: 1.8em; }
+  .referencias li { margin-bottom: .7em; text-align: justify; }
+  footer {
+    margin-top: 3.5em; padding-top: 1.5em; border-top: 2px solid #2a2a2a;
+    text-align: center; font-size: .85em; color: #6a6a6a; font-style: italic;
+    letter-spacing: .02em;
+  }
+  .lang-separator {
+    border: none; border-top: 2px solid #2a2a2a; margin: 3em 0;
+    text-align: center; font-variant: small-caps; letter-spacing: .1em;
+    color: #3a3a3a; font-size: .95em;
+  }
+  .lang-separator span {
+    background: #fafaf7; padding: 0 1em; position: relative; top: -0.7em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>RSA Public Exponents with Hamming Weight 3<br>Experimental Study and Feasibility Analysis</h1>
+  <div class="subtitle">Technical Documentation &mdash; Bilingual Edition</div>
+  <div class="date">July 2026</div>
+</header>
+
+<!-- ==================== ENGLISH ==================== -->
+<section lang="en">
+
+<div class="abstract">
+  <h2>Abstract</h2>
+  <p>This document presents an experimental investigation into the feasibility of employing large RSA public exponents whose Hamming weight is exactly three. While the conventional choice of Fermat primes —most notably <code>e = 65537</code>— provides an optimal balance between efficiency and security, this study explores whether much larger, sparse exponents can be generated, mathematically validated, and practically employed within the RSA cryptosystem. The experimental methodology, computational results, combinatorial analysis, and implications for security, performance, and interoperability are discussed in detail.</p>
+  <div class="keywords"><strong>Keywords:</strong> RSA, public exponent, Hamming weight, Fermat primes, experimental cryptography, FIPS standards.</div>
+</div>
+
+<h2>1. Introduction</h2>
+<p>The RSA algorithm, introduced by Rivest, Shamir and Adleman in 1977, remains a cornerstone of modern public-key cryptography. Its security relies on the computational difficulty of factoring large integers and, more specifically, on the intractability of the RSA problem: extracting <em>e</em>-th roots modulo <code>n</code> without knowledge of the factorization of the modulus.</p>
+<p>Key generation in RSA requires the selection of several parameters. Among them, the public exponent <code>e</code> plays a distinctive role: it must be coprime with <code>λ(n) = lcm(p−1, q−1)</code> and, for performance reasons, it is desirable that its binary representation exhibits a low Hamming weight. Historically, these requirements have led to the near-universal adoption of the Fermat primes <code>F₀ = 3</code>, <code>F₁ = 5</code>, <code>F₂ = 17</code>, <code>F₃ = 257</code> and <code>F₄ = 65537</code>, the last of which has become the de facto standard in virtually every implementation.</p>
+<p>This project examines a different possibility: whether large prime numbers with Hamming weight equal to three can be employed as RSA public exponents. The investigation does not propose a replacement for <code>e = 65537</code>, but rather documents the mathematical, computational, and practical aspects of such a choice in a reproducible manner.</p>
+
+<h2>2. Theoretical Background</h2>
+<h3>2.1 RSA essentials</h3>
+<p>RSA operates over a modulus <code>n = p·q</code>, the product of two large primes. The public key is the pair <code>(n, e)</code> and the private key is <code>(n, d)</code>, where <code>d</code> is the modular inverse of <code>e</code> modulo <code>λ(n)</code>. The fundamental operations are:</p>
+<ul>
+<li><strong>Encryption:</strong> <code>c = m<sup>e</sup> mod n</code>.</li>
+<li><strong>Decryption:</strong> <code>m = c<sup>d</sup> mod n</code>.</li>
+<li><strong>Signing:</strong> <code>s = h<sup>d</sup> mod n</code>, where <code>h</code> is a message digest.</li>
+<li><strong>Verification:</strong> <code>h = s<sup>e</sup> mod n</code>.</li>
+</ul>
+<p>The public exponent appears in encryption and signature verification, while the private exponent is used in decryption and signing. Consequently, the size of <code>e</code> primarily affects the performance of operations that are frequently carried out by servers and clients.</p>
+
+<h3>2.2 Criteria for selecting the public exponent</h3>
+<ol>
+<li><strong>Mathematical correctness:</strong> <code>e</code> must be coprime with <code>λ(n)</code>. Since <code>p</code> and <code>q</code> are primes, it suffices that <code>e</code> does not divide <code>p−1</code> or <code>q−1</code>. Choosing a prime <code>e</code> simplifies this verification.</li>
+<li><strong>Security:</strong> very small values of <code>e</code> are vulnerable to specific attacks —Håstad (1986), Coppersmith (1996), small-message attacks— that do not generalise to larger exponents. This has led to the deprecation of <code>e = 3</code> since the late 1990s.</li>
+<li><strong>Efficiency:</strong> binary exponentiation (square-and-multiply) performs <code>⌊log₂ e⌋</code> squarings and <code>Hamming(e) − 1</code> additional multiplications. Minimising the Hamming weight reduces the cost of encryption and verification.</li>
+</ol>
+
+<h3>2.3 Fermat primes</h3>
+<p>Fermat primes are numbers of the form <code>F<sub>k</sub> = 2<sup>2<sup>k</sup></sup> + 1</code>. Only five prime values are known, from <code>F₀</code> to <code>F₄</code>. Their binary representation consists of a leading 1, followed by zeros, and ending in 1; they therefore have Hamming weight equal to 2. <code>F₄ = 65537</code> offers a particularly favourable trade-off: its magnitude suffices to avoid known attacks against <code>e = 3</code>, while its weight-2 representation reduces exponentiation to 16 squarings and 1 multiplication.</p>
+
+<h2>3. Research Hypothesis</h2>
+<p>This study investigates whether it is feasible to construct RSA public exponents of large magnitude —comparable in bit length to the modulus <code>n</code>— that retain a low Hamming weight (exactly 3), are prime, and function correctly within standard RSA schemes. The underlying motivation is partially defensive: although no public literature demonstrates an advantage, the existence of unpublished cryptanalytic results capable of weakening RSA for small <code>e</code> cannot be ruled out a priori. In such a context, larger exponents might constitute a precautionary measure, despite the associated computational and interoperability costs.</p>
+
+<h2>4. Experimental Methodology</h2>
+<h3>4.1 Candidate generation</h3>
+<p>For each bit length <code>k</code> under consideration, candidates are constructed by fixing:</p>
+<ul>
+<li>The most significant bit to 1, to guarantee exactly <code>k</code> bits.</li>
+<li>The least significant bit to 1, to guarantee an odd number (a necessary condition for primality, excluding the trivial case of 2).</li>
+</ul>
+<p>With these two constraints, the third active bit may be placed in any of the <code>k − 2</code> intermediate positions. The total number of candidates is therefore <code>k − 2</code>, each of which is submitted to a primality test.</p>
+
+<h3>4.2 Primality testing</h3>
+<p>Primality was assessed using the Miller–Rabin test implemented in <code>openssl</code>, with a sufficient number of rounds to guarantee a negligible error probability for the purposes of this study.</p>
+
+<h3>4.3 Operational validation</h3>
+<p>The primes thus obtained were used as public exponents in RSA key generation, and their correct functioning was verified via encryption, decryption, signing, and verification operations with <code>openssl</code>. Additionally, interoperability tests were performed with Adobe Acrobat for PDF document signing.</p>
+
+<h2>5. Experimental Results</h2>
+<h3>5.1 Small-scale examples (8, 16, 32 bits)</h3>
+<p>To illustrate the generation process, the script output for bit lengths 8, 16, and 32 is reproduced below. These examples serve as a direct demonstration of the candidate construction and primality detection.</p>
+
+<pre>generando todos los numeros primos de 8 bits con exactamente 3 bits en 1 ...
+creando numero base
+base=10000001
+recorriendo todos los que tienen peso de hamming = 3 ...
+binario=11000001
+decimal=193
+binario=10001001
+decimal=137
+binario=10000011
+decimal=131</pre>
+
+<pre>generando todos los numeros primos de 16 bits con exactamente 3 bits en 1 ...
+creando numero base
+base=1000000000000001
+recorriendo todos los que tienen peso de hamming = 3 ...
+binario=1010000000000001
+decimal=40961
+binario=1000000001000001
+decimal=32833
+binario=1000000000100001
+decimal=32801
+binario=1000000000000011
+decimal=32771</pre>
+
+<pre>generando todos los numeros primos de 32 bits con exactamente 3 bits en 1 ...
+creando numero base
+base=10000000000000000000000000000001
+recorriendo todos los que tienen peso de hamming = 3 ...
+binario=11000000000000000000000000000001
+decimal=3221225473
+binario=10001000000000000000000000000001
+decimal=2281701377
+binario=10000000010000000000000000000001
+decimal=2151677953
+binario=10000000000000000000001000000001
+decimal=2147484161
+binario=10000000000000000000000010000001
+decimal=2147483777
+binario=10000000000000000000000001000001
+decimal=2147483713</pre>
+
+<h3>5.2 Prime counts across bit sizes</h3>
+<p>The table below summarises the number of Hamming-weight-3 primes found for each magnitude examined, from 8 up to 16536 bits.</p>
+
+<table>
+<caption>Table 1. Hamming-weight-3 primes found per bit length.</caption>
+<tr><th>Bit length (k)</th><th>Candidates (k−2)</th><th>Primes found</th></tr>
+<tr><td>8</td><td>6</td><td>3</td></tr>
+<tr><td>16</td><td>14</td><td>4</td></tr>
+<tr><td>32</td><td>30</td><td>6</td></tr>
+<tr><td>64</td><td>62</td><td>2</td></tr>
+<tr><td>128</td><td>126</td><td>6</td></tr>
+<tr><td>256</td><td>254</td><td>4</td></tr>
+<tr><td>512</td><td>510</td><td>5</td></tr>
+<tr><td>1024</td><td>1022</td><td>3</td></tr>
+<tr><td>2048</td><td>2046</td><td>5</td></tr>
+<tr><td>4096</td><td>4094</td><td>6</td></tr>
+<tr><td>8192</td><td>8190</td><td>6</td></tr>
+<tr><td>16536</td><td>16534</td><td>3</td></tr>
+</table>
+
+<h3>5.3 Combinatorial analysis</h3>
+<p>By the Prime Number Theorem, the density of primes around <code>2<sup>k</sup></code> is approximately <code>1/(k·ln 2)</code>. The expected number of primes among the <code>k − 2</code> candidates is thus:</p>
+<p style="text-align:center; font-style:italic; margin:1em 0;">E[primes] = (k − 2) / (k · ln 2)</p>
+<p>For large <code>k</code>, this expression tends to <code>1/ln 2 ≈ 1.4427</code>. The observed values, ranging from 2 to 6, are statistically compatible with a Poisson process of rate <code>λ ≈ 1.44</code>. No significant discrepancies between experiment and theory were detected.</p>
+
+<h3>5.4 Operational validation</h3>
+<p>All generated exponents passed the mathematical validation with <code>openssl</code>: encryption, decryption, signing, and verification operations succeeded without error, including for exponents as large as 16536 bits. However, interoperability tests with Adobe Acrobat for PDF signing failed; the application rejected keys with non-standard exponents, recognising only the conventional values.</p>
+
+<h2>6. Discussion</h2>
+<h3>6.1 Security considerations</h3>
+<p>From the standpoint of provable mathematical security, the size of the public exponent does not constitute a strength factor for RSA. The security of the algorithm rests on the size of the modulus <code>n</code> and the difficulty of the RSA problem, not on the magnitude of <code>e</code>. A 4096-bit exponent offers no greater resistance against Shor's algorithm than <code>e = 65537</code>: both schemes are equally vulnerable to a sufficiently capable quantum computer.</p>
+<p>The known attacks that motivated the deprecation of <code>e = 3</code> —broadcast attacks, Coppersmith's method, PKCS#1 v1.5 weaknesses— do not extend to <code>e = 65537</code>, and there exists no evidence in the open literature that they would extend to exponents of intermediate or larger size. The hypothesis of unpublished attacks, while intellectually legitimate, is essentially unfalsifiable and, as a design criterion, leads to a regression without a well-defined termination.</p>
+
+<h3>6.2 Computational cost</h3>
+<p>Employing exponents with Hamming weight 3 and a magnitude comparable to that of the modulus imposes a significantly higher computational burden on encryption and signature verification. For a 4096-bit exponent of weight 3, binary exponentiation requires 4095 squarings and 2 multiplications, compared with 16 squarings and 1 multiplication for <code>e = 65537</code>. The increase is roughly two orders of magnitude, which may be relevant in high-frequency verification scenarios such as TLS servers, X.509 certificate validation, and signed document processing, potentially exposing systems to resource-exhaustion denial-of-service attacks.</p>
+
+<h3>6.3 Interoperability and standards compliance</h3>
+<p>Current cryptographic standards —FIPS 186-4/5, NIST SP 800-78-4, RFC 8017, RFC 5280— recommend or assume <code>e = 65537</code> as the standard value. Although the language of some of these documents is suggestive rather than prescriptive, the operational ecosystem —CMVP-validated cryptographic modules, certificate authorities subject to the CA/Browser Forum Baseline Requirements, and end-user applications such as Adobe Acrobat— effectively enforces conformity with this value. The use of non-standard exponents places the system outside the validated ecosystem, with consequent limitations on interoperability, auditability, and adoption.</p>
+
+<h2>7. Conclusions</h2>
+<ol>
+<li>It is technically feasible to generate large prime numbers with Hamming weight 3 and to employ them as public exponents in RSA schemes. The generation process aligns with theoretical predictions, and the resulting cryptographic operations are mathematically correct.</li>
+<li>The size of the public exponent does not, by itself, constitute a demonstrable security factor. The hypothesis of unpublished attacks against small <code>e</code>, while not refutable, lacks empirical support in the open literature and does not provide an operationally useful design criterion.</li>
+<li>Large Hamming-weight-3 exponents impose significant computational costs —on the order of 240× for 4096-bit exponents— on encryption and signature verification, without a quantifiable security benefit.</li>
+<li>Interoperability with the standard ecosystem, including end-user applications and validated cryptographic modules, is lost when non-conventional exponents are employed, in accordance with the validation policies derived from current standards.</li>
+<li>The value of this research lies in the experimental demonstration of the operational feasibility of the scheme and in the quantitative analysis of its trade-offs. Practical application is restricted to experimental, private, or academic contexts where interoperability is not a requirement.</li>
+</ol>
+
+<h2>8. References</h2>
+<div class="referencias">
+<ol>
+<li>Rivest, R., Shamir, A., &amp; Adleman, L. (1977). <em>A Method for Obtaining Digital Signatures and Public-Key Cryptosystems</em>. Communications of the ACM, 21(2), 120–126.</li>
+<li>Håstad, J. (1986). <em>Solving Simultaneous Modular Equations of Low Degree</em>. SIAM Journal on Computing, 17(2), 336–341.</li>
+<li>Coppersmith, D. (1996). <em>Small Solutions to Polynomial Equations, and Low Exponent RSA Vulnerabilities</em>. Journal of Cryptology, 10(3), 233–260.</li>
+<li>Bleichenbacher, D. (2006). <em>Forging DSA Signatures and PKCS#1 v1.5 Signatures</em>. Presentation at the Crypto 2006 rump session.</li>
+<li>NIST. (2013). <em>FIPS 186-4: Digital Signature Standard</em>. National Institute of Standards and Technology.</li>
+<li>NIST. (2015). <em>SP 800-78-4: Cryptographic Algorithms and Key Sizes for Personal Identity Verification</em>.</li>
+<li>NIST. (2020). <em>SP 800-57 Part 1 Rev. 2: Recommendation for Key Management</em>.</li>
+<li>RFC 8017. (2016). <em>PKCS #1: RSA Cryptography Specifications Version 2.2</em>. IETF.</li>
+<li>RFC 5280. (2008). <em>Internet X.509 Public Key Infrastructure Certificate and CRL Profile</em>. IETF.</li>
+<li>Shor, P. W. (1997). <em>Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer</em>. SIAM Journal on Computing, 26(5), 1484–1509.</li>
+</ol>
+</div>
+
+</section>
+
+<!-- Separador bilingüe -->
+<div class="lang-separator"><span>ESPAÑOL</span></div>
+
+<!-- ==================== ESPAÑOL ==================== -->
+<section lang="es">
+
+<div class="abstract">
+  <h2>Resumen</h2>
+  <p>El presente documento expone una investigación experimental sobre la viabilidad de emplear exponentes públicos RSA de gran magnitud cuyo peso de Hamming sea exactamente tres. Si bien la elección convencional de los primos de Fermat —en particular <code>e = 65537</code>— ofrece un equilibrio óptimo entre eficiencia y seguridad, este estudio examina si es posible generar exponentes mucho mayores y dispersos, validarlos matemáticamente y utilizarlos de forma práctica en el criptosistema RSA. Se describen la metodología experimental, los resultados computacionales, el análisis combinatorio y las implicaciones en materia de seguridad, rendimiento e interoperabilidad.</p>
+  <div class="keywords"><strong>Palabras clave:</strong> RSA, exponente público, peso de Hamming, primos de Fermat, criptografía experimental, estándares FIPS.</div>
+</div>
+
+<h2>1. Introducción</h2>
+<p>El algoritmo RSA, formulado por Rivest, Shamir y Adleman en 1977, sigue siendo uno de los pilares de la criptografía de clave pública contemporánea. Su seguridad descansa en la dificultad computacional del problema de factorización de enteros grandes y, más concretamente, en la dificultad del problema RSA: la extracción de raíces <em>e</em>-ésimas módulo <code>n</code> sin conocer la factorización del módulo.</p>
+<p>La generación de claves RSA requiere la selección de varios parámetros. Entre ellos, el exponente público <code>e</code> ocupa un lugar particular: debe ser coprimo con <code>λ(n) = mcm(p−1, q−1)</code> y, por razones de eficiencia, es deseable que su representación binaria tenga un peso de Hamming bajo. Históricamente, estos requisitos han conducido a la adopción casi universal de los primos de Fermat <code>F₀ = 3</code>, <code>F₁ = 5</code>, <code>F₂ = 17</code>, <code>F₃ = 257</code> y <code>F₄ = 65537</code>, de los cuales el último se ha consolidado como valor de facto en la práctica totalidad de las implementaciones.</p>
+<p>Este proyecto explora una posibilidad diferente: si números primos de gran tamaño con peso de Hamming igual a tres pueden emplearse como exponentes públicos RSA. La investigación no propone sustituir <code>e = 65537</code>, sino documentar de forma reproducible los aspectos matemáticos, computacionales y prácticos de dicha elección.</p>
+
+<h2>2. Marco teórico</h2>
+<h3>2.1 Fundamentos de RSA</h3>
+<p>RSA opera sobre un módulo <code>n = p·q</code>, producto de dos primos grandes. La clave pública es el par <code>(n, e)</code> y la clave privada es <code>(n, d)</code>, donde <code>d</code> es el inverso multiplicativo de <code>e</code> módulo <code>λ(n)</code>. Las operaciones fundamentales son:</p>
+<ul>
+<li><strong>Cifrado:</strong> <code>c = m<sup>e</sup> mod n</code>.</li>
+<li><strong>Descifrado:</strong> <code>m = c<sup>d</sup> mod n</code>.</li>
+<li><strong>Firma:</strong> <code>s = h<sup>d</sup> mod n</code>, donde <code>h</code> es el resumen del mensaje.</li>
+<li><strong>Verificación:</strong> <code>h = s<sup>e</sup> mod n</code>.</li>
+</ul>
+<p>El exponente público interviene en el cifrado y la verificación de firma, mientras que el exponente privado se emplea en el descifrado y la generación de firma. En consecuencia, el tamaño de <code>e</code> afecta principalmente al rendimiento de las operaciones que ejecutan con frecuencia servidores y clientes.</p>
+
+<h3>2.2 Criterios de selección del exponente público</h3>
+<ol>
+<li><strong>Corrección matemática:</strong> <code>e</code> debe ser coprimo con <code>λ(n)</code>. Dado que <code>p</code> y <code>q</code> son primos, basta con que <code>e</code> no divida a <code>p−1</code> ni a <code>q−1</code>. Elegir un <code>e</code> primo simplifica esta verificación.</li>
+<li><strong>Seguridad:</strong> valores muy pequeños de <code>e</code> son vulnerables a ataques específicos —Håstad (1986), Coppersmith (1996), ataques de mensaje pequeño— que no se extienden a exponentes de mayor tamaño. Esto ha llevado a desaconsejar <code>e = 3</code> desde finales de los años noventa.</li>
+<li><strong>Eficiencia:</strong> la exponenciación binaria (square-and-multiply) realiza <code>⌊log₂ e⌋</code> cuadrados y <code>Hamming(e) − 1</code> multiplicaciones adicionales. Minimizar el peso de Hamming reduce el coste de cifrado y verificación.</li>
+</ol>
+
+<h3>2.3 Los primos de Fermat</h3>
+<p>Los primos de Fermat son números de la forma <code>F<sub>k</sub> = 2<sup>2<sup>k</sup></sup> + 1</code>. Solo se conocen cinco valores primos, de <code>F₀</code> a <code>F₄</code>. Su representación binaria consiste en un 1 inicial, seguido de ceros, y finalizado en 1; poseen, por tanto, peso de Hamming igual a 2. <code>F₄ = 65537</code> ofrece un equilibrio especialmente favorable: su magnitud basta para evitar los ataques conocidos contra <code>e = 3</code>, mientras que su peso 2 reduce la exponenciación a 16 cuadrados y 1 multiplicación.</p>
+
+<h2>3. Hipótesis de investigación</h2>
+<p>Se investiga si es factible construir exponentes públicos RSA de gran magnitud —comparables en bits al módulo <code>n</code>— que mantengan un peso de Hamming bajo (exactamente 3), sean primos y funcionen correctamente en esquemas RSA estándar. La motivación subyacente es en parte defensiva: aunque la literatura abierta no documenta ventaja alguna, no puede descartarse a priori la existencia de resultados criptoanalíticos no publicados capaces de debilitar RSA para valores pequeños de <code>e</code>. En ese contexto, exponentes mayores podrían constituir una medida de precaución, pese a los costes computacionales y de interoperabilidad asociados.</p>
+
+<h2>4. Metodología experimental</h2>
+<h3>4.1 Generación de candidatos</h3>
+<p>Para cada longitud en bits <code>k</code> considerada, se construyen candidatos fijando:</p>
+<ul>
+<li>El bit más significativo a 1, para garantizar exactamente <code>k</code> bits.</li>
+<li>El bit menos significativo a 1, para garantizar que el número sea impar (condición necesaria para la primalidad, salvo el caso trivial del 2).</li>
+</ul>
+<p>Con estas dos restricciones, el tercer bit activo puede situarse en cualquiera de las <code>k − 2</code> posiciones intermedias. El número total de candidatos es, por tanto, <code>k − 2</code>, y cada uno se somete a una prueba de primalidad.</p>
+
+<h3>4.2 Verificación de primalidad</h3>
+<p>La primalidad se comprobó mediante el test de Miller–Rabin implementado en <code>openssl</code>, con un número suficiente de rondas para garantizar una probabilidad de error despreciable en el contexto del estudio.</p>
+
+<h3>4.3 Validación operativa</h3>
+<p>Los primos obtenidos se emplearon como exponentes públicos en la generación de claves RSA, y se verificó su correcto funcionamiento mediante operaciones de cifrado, descifrado, firma y verificación con <code>openssl</code>. Adicionalmente, se realizaron pruebas de interoperabilidad con Adobe Acrobat para la firma de documentos PDF.</p>
+
+<h2>5. Resultados experimentales</h2>
+<h3>5.1 Ejemplos a pequeña escala (8, 16, 32 bits)</h3>
+<p>Para ilustrar el proceso de generación, se reproduce a continuación la salida del script para longitudes de 8, 16 y 32 bits. Estos ejemplos sirven como demostración directa de la construcción de candidatos y la detección de primalidad.</p>
+
+<pre>generando todos los numeros primos de 8 bits con exactamente 3 bits en 1 ...
+creando numero base
+base=10000001
+recorriendo todos los que tienen peso de hamming = 3 ...
+binario=11000001
+decimal=193
+binario=10001001
+decimal=137
+binario=10000011
+decimal=131</pre>
+
+<pre>generando todos los numeros primos de 16 bits con exactamente 3 bits en 1 ...
+creando numero base
+base=1000000000000001
+recorriendo todos los que tienen peso de hamming = 3 ...
+binario=1010000000000001
+decimal=40961
+binario=1000000001000001
+decimal=32833
+binario=1000000000100001
+decimal=32801
+binario=1000000000000011
+decimal=32771</pre>
+
+<pre>generando todos los numeros primos de 32 bits con exactamente 3 bits en 1 ...
+creando numero base
+base=10000000000000000000000000000001
+recorriendo todos los que tienen peso de hamming = 3 ...
+binario=11000000000000000000000000000001
+decimal=3221225473
+binario=10001000000000000000000000000001
+decimal=2281701377
+binario=10000000010000000000000000000001
+decimal=2151677953
+binario=10000000000000000000001000000001
+decimal=2147484161
+binario=10000000000000000000000010000001
+decimal=2147483777
+binario=10000000000000000000000001000001
+decimal=2147483713</pre>
+
+<h3>5.2 Recuento de primos por magnitud</h3>
+<p>La tabla siguiente resume el número de primos de peso de Hamming 3 encontrados para cada magnitud examinada, desde 8 hasta 16536 bits.</p>
+
+<table>
+<caption>Tabla 1. Primos de peso de Hamming 3 encontrados por magnitud.</caption>
+<tr><th>Magnitud (bits)</th><th>Candidatos (k−2)</th><th>Primos encontrados</th></tr>
+<tr><td>8</td><td>6</td><td>3</td></tr>
+<tr><td>16</td><td>14</td><td>4</td></tr>
+<tr><td>32</td><td>30</td><td>6</td></tr>
+<tr><td>64</td><td>62</td><td>2</td></tr>
+<tr><td>128</td><td>126</td><td>6</td></tr>
+<tr><td>256</td><td>254</td><td>4</td></tr>
+<tr><td>512</td><td>510</td><td>5</td></tr>
+<tr><td>1024</td><td>1022</td><td>3</td></tr>
+<tr><td>2048</td><td>2046</td><td>5</td></tr>
+<tr><td>4096</td><td>4094</td><td>6</td></tr>
+<tr><td>8192</td><td>8190</td><td>6</td></tr>
+<tr><td>16536</td><td>16534</td><td>3</td></tr>
+</table>
+
+<h3>5.3 Análisis combinatorio</h3>
+<p>Conforme al teorema de los números primos, la densidad de primos en torno a <code>2<sup>k</sup></code> es aproximadamente <code>1/(k·ln 2)</code>. El número esperado de primos entre los <code>k − 2</code> candidatos es, por tanto:</p>
+<p style="text-align:center; font-style:italic; margin:1em 0;">E[primos] = (k − 2) / (k · ln 2)</p>
+<p>Para valores grandes de <code>k</code>, esta expresión tiende a <code>1/ln 2 ≈ 1,4427</code>. Los valores observados, situados en el rango de 2 a 6, son estadísticamente compatibles con un proceso de Poisson de tasa <code>λ ≈ 1,44</code>. No se detectaron discrepancias significativas entre experimento y teoría.</p>
+
+<h3>5.4 Validación operativa</h3>
+<p>Todos los exponentes generados superaron la validación matemática con <code>openssl</code>: las operaciones de cifrado, descifrado, firma y verificación se ejecutaron sin error, incluidos exponentes de 16536 bits. Sin embargo, las pruebas de interoperabilidad con Adobe Acrobat para firma de PDF no resultaron satisfactorias; la aplicación rechazó las claves con exponentes no estándar y solo reconoció los valores convencionales.</p>
+
+<h2>6. Discusión</h2>
+<h3>6.1 Consideraciones de seguridad</h3>
+<p>Desde el punto de vista de la seguridad matemática demostrable, el tamaño del exponente público no constituye un factor de fortaleza del algoritmo RSA. La seguridad descansa en el tamaño del módulo <code>n</code> y en la dificultad del problema RSA, no en la magnitud de <code>e</code>. Un exponente de 4096 bits no ofrece mayor resistencia frente al algoritmo de Shor que <code>e = 65537</code>: ambos esquemas son igualmente vulnerables ante un computador cuántico con capacidad suficiente.</p>
+<p>Los ataques conocidos que motivaron el desaconsejamiento de <code>e = 3</code> —ataques de difusión, método de Coppersmith, debilidades en PKCS#1 v1.5— no se extienden a <code>e = 65537</code>, y no existe evidencia en la literatura abierta de que pudieran extenderse a exponentes de tamaño intermedio o superior. La hipótesis de ataques no publicados, aunque intelectualmente legítima, es esencialmente infalsificable y, como criterio de diseño, conduce a una regresión sin término definido.</p>
+
+<h3>6.2 Coste computacional</h3>
+<p>El empleo de exponentes con peso de Hamming 3 y magnitud comparable a la del módulo impone un coste computacional notablemente mayor en las operaciones de cifrado y verificación de firma. Para un exponente de 4096 bits con peso 3, la exponenciación binaria requiere 4095 cuadrados y 2 multiplicaciones, frente a los 16 cuadrados y 1 multiplicación de <code>e = 65537</code>. El incremento es de aproximadamente dos órdenes de magnitud, lo que puede ser relevante en escenarios de verificación frecuente —servidores TLS, validación de certificados X.509, procesamiento de documentos firmados— y exponer a los sistemas a ataques de denegación de servicio por agotamiento de recursos.</p>
+
+<h3>6.3 Interoperabilidad y conformidad normativa</h3>
+<p>Los estándares criptográficos actuales —FIPS 186-4/5, NIST SP 800-78-4, RFC 8017, RFC 5280— recomiendan o asumen <code>e = 65537</code> como valor estándar. Aunque el lenguaje de algunos documentos es más sugerente que prescriptivo, el ecosistema operativo —módulos criptográficos validados bajo CMVP, autoridades de certificación sujetas a los Baseline Requirements del CA/Browser Forum, y aplicaciones de usuario final como Adobe Acrobat— impone en la práctica la conformidad con este valor. El uso de exponentes no estándar sitúa al sistema fuera del ecosistema validado, con las consiguientes limitaciones de interoperabilidad, auditoría y adopción.</p>
+
+<h2>7. Conclusiones</h2>
+<ol>
+<li>Es técnicamente viable generar números primos de gran tamaño con peso de Hamming 3 y emplearlos como exponentes públicos en esquemas RSA. La generación se ajusta a las predicciones teóricas y las operaciones criptográficas resultantes son matemáticamente correctas.</li>
+<li>El tamaño del exponente público no constituye, por sí mismo, un factor de seguridad demostrable. La hipótesis de ataques no publicados contra valores pequeños de <code>e</code>, aunque no refutable, carece de soporte empírico en la literatura abierta y no proporciona un criterio de diseño operacionalmente útil.</li>
+<li>Los exponentes grandes de peso de Hamming 3 imponen costes computacionales significativos —del orden de 240 veces para exponentes de 4096 bits— en cifrado y verificación de firma, sin un beneficio de seguridad cuantificable.</li>
+<li>La interoperabilidad con el ecosistema estándar, incluyendo aplicaciones de usuario final y módulos criptográficos validados, se pierde al emplear exponentes no convencionales, conforme a las políticas de validación derivadas de los estándares vigentes.</li>
+<li>El valor de esta investigación reside en la demostración experimental de la viabilidad operativa del esquema y en el análisis cuantitativo de sus compromisos. Su aplicación práctica queda restringida a contextos experimentales, privados o académicos donde la interoperabilidad no sea un requisito.</li>
+</ol>
+
+<h2>8. Referencias</h2>
+<div class="referencias">
+<ol>
+<li>Rivest, R., Shamir, A., &amp; Adleman, L. (1977). <em>A Method for Obtaining Digital Signatures and Public-Key Cryptosystems</em>. Communications of the ACM, 21(2), 120–126.</li>
+<li>Håstad, J. (1986). <em>Solving Simultaneous Modular Equations of Low Degree</em>. SIAM Journal on Computing, 17(2), 336–341.</li>
+<li>Coppersmith, D. (1996). <em>Small Solutions to Polynomial Equations, and Low Exponent RSA Vulnerabilities</em>. Journal of Cryptology, 10(3), 233–260.</li>
+<li>Bleichenbacher, D. (2006). <em>Forging DSA Signatures and PKCS#1 v1.5 Signatures</em>. Presentación en el rump session de Crypto 2006.</li>
+<li>NIST. (2013). <em>FIPS 186-4: Digital Signature Standard</em>. National Institute of Standards and Technology.</li>
+<li>NIST. (2015). <em>SP 800-78-4: Cryptographic Algorithms and Key Sizes for Personal Identity Verification</em>.</li>
+<li>NIST. (2020). <em>SP 800-57 Part 1 Rev. 2: Recommendation for Key Management</em>.</li>
+<li>RFC 8017. (2016). <em>PKCS #1: RSA Cryptography Specifications Version 2.2</em>. IETF.</li>
+<li>RFC 5280. (2008). <em>Internet X.509 Public Key Infrastructure Certificate and CRL Profile</em>. IETF.</li>
+<li>Shor, P. W. (1997). <em>Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer</em>. SIAM Journal on Computing, 26(5), 1484–1509.</li>
+</ol>
+</div>
+
+</section>
+
+<footer>
+  Technical documentation for the <strong>rsa-hamming3-exponents</strong> project — Bilingual edition (English / Español).<br>
+  Author: Israel González Delgado — israelglezdelgado@gmail.com — github.com/israelglezdelgado-lang
+</footer>
+
+</body>
+</html>
