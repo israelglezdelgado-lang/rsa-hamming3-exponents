@@ -175,6 +175,11 @@ israelglezdelgado@gmail.com
 
 ---
 
+## 📄 Full Documentation (rendered) · Documentación completa (renderizada)
+
+- English: [View the bilingual technical paper](https://israelglezdelgado-lang.github.io/rsa-hamming3-exponents/documentation.html)
+- Español: [Ver la disertación técnica bilingüe](https://israelglezdelgado-lang.github.io/rsa-hamming3-exponents/documentation.html)
+
 # Español
 
 ## Descripción
