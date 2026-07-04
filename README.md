@@ -1,247 +1,340 @@
-# RSA Public Exponents with Hamming Weight 3
+# rsa-hamming3-exponents
 
-<div align="center">
-
-**Experimental generation of non-standard RSA public exponents**
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Docs: CC BY 4.0](https://img.shields.io/badge/Docs-CC%20BY%204.0-lightgrey.svg)](LICENSE-DOCUMENTATION)
-[![Bash](https://img.shields.io/badge/Bash-4.0%2B-green.svg)]()
-[![OpenSSL](https://img.shields.io/badge/OpenSSL-1.1.1%2B-orange.svg)]()
-
-[🇬🇧 English](#-english) | [🇪🇸 Español](#-español)
-
-</div>
+**Experimental generation and evaluation of RSA public exponents with Hamming weight equal to 3**  
+**Generación y evaluación experimental de exponentes públicos RSA con peso de Hamming igual a 3**
 
 ---
 
-## 🇬🇧 English
+# English
 
-### Table of Contents
-- [Overview](#overview)
-- [Motivation](#motivation)
-- [Features](#features)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Example Outputs](#example-outputs)
-- [Experimental Results](#experimental-results)
-- [Theoretical Background](#theoretical-background)
-- [Security Considerations](#security-considerations)
-- [Repository Structure](#repository-structure)
-- [Documentation & License](#documentation--license)
-- [Author](#author)
+## Overview
 
-### Overview
-This repository provides a Bash script that enumerates **all prime numbers of exactly *N* bits with Hamming weight equal to 3**, using `openssl` for Miller–Rabin primality testing. The generated primes are suitable for use as **non-standard public exponents** in RSA cryptosystems.
+This repository contains the material associated with an experimental cryptographic research project that investigates the use of **large RSA public exponents having exactly three bits set (Hamming weight = 3)**.
 
-The project originated as an experimental investigation into whether RSA could operate correctly with public exponents significantly larger than the conventional Fermat primes (3, 5, 17, 257, 65537), while maintaining a low Hamming weight for computational efficiency.
+For decades, virtually every practical RSA implementation has adopted the public exponent **65537**, a Fermat prime with Hamming weight equal to two. This value provides an excellent compromise between computational efficiency, interoperability and security.
 
-### Motivation
-The conventional choice of `e = 65537` (Fermat prime F₄) in RSA implementations is driven by three factors:
-1. **Efficiency**: Hamming weight of 2 minimizes modular exponentiation cost (16 squares + 1 multiplication).
-2. **Security**: Large enough to avoid attacks against small exponents (Håstad 1986, Coppersmith 1996, small-message attacks, PKCS#1 v1.5 vulnerabilities).
-3. **Standardization**: Recommended by FIPS 186-4/5, NIST SP 800-78-4, and assumed by PKCS#1 v2.2 (RFC 8017) and X.509/PKIX (RFC 5280).
+The purpose of this project is **not** to replace the standard exponent, but rather to experimentally study whether very large sparse public exponents can be generated efficiently, whether they satisfy the mathematical requirements imposed by RSA, and what practical consequences arise from their use.
 
-This project explores whether exponents with **Hamming weight 3** and bit lengths comparable to the RSA modulus *n* are viable alternatives. While such exponents sacrifice interoperability with standard-compliant applications (e.g., Adobe Acrobat PDF signing), they remain mathematically valid and may offer defensive value against hypothetical unpublished cryptanalytic results targeting small exponents.
+The project includes:
 
-### Features
-- ✅ Enumerates **all** primes of exactly *N* bits with Hamming weight 3
-- ✅ Uses `openssl` for cryptographically secure primality testing (Miller–Rabin)
-- ✅ Enforces parity constraint (least significant bit = 1)
-- ✅ **Robust argument validation**: integer check, minimum value (N ≥ 3), confirmation prompt for very large values
-- ✅ **Progress indicator**: reports evaluation progress every 100 candidates
-- ✅ **Execution timing**: measures and displays total runtime
-- ✅ **Prime counter**: reports total number of primes found at completion
-- ✅ **Hexadecimal mode**: uses `openssl prime -hex` for robustness with large numbers
-- ✅ **Native binary-to-decimal conversion**: uses Bash arithmetic (no `bc` dependency)
-- ✅ **Help option**: `-h` or `--help` displays usage information
-- ✅ Tested with bit lengths from 8 to 16,536 bits
+- A Bash generator for Hamming-weight-3 prime exponents.
+- Experimental methodology.
+- Statistical observations.
+- Mathematical discussion.
+- Performance considerations.
+- Interoperability analysis.
+- A bilingual technical paper documenting the research.
 
-### Requirements
-- **Bash** 4.0 or later
-- **OpenSSL** command-line tool (tested with OpenSSL 1.1.1+ and 3.x)
-- Unix-like environment (Linux, macOS, BSD)
+This repository is intended for educational, academic and experimental purposes.
 
-### Installation
-```bash
-git clone https://github.com/israelglezdelgado-lang/rsa-hamming3-exponents.git
-cd rsa-hamming3-exponents
+---
+
+## Motivation
+
+The research started from a simple observation.
+
+Current RSA moduli commonly use sizes such as:
+
+- 2048 bits
+- 3072 bits
+- 4096 bits
+
+while the public exponent almost universally remains
+
+```
+65537
+```
+
+which occupies only 17 bits.
+
+This naturally raises the question:
+
+> Can RSA operate correctly with public exponents having thousands of bits while preserving a very low Hamming weight?
+
+This repository attempts to answer that question experimentally.
+
+---
+
+## Repository contents
+
+```
+rsa-hamming3-exponents/
+│
+├── hamming3_primes.sh
+├── README.md
+├── documentation.html
+└── LICENSE
+```
+
+---
+
+## Generator
+
+The Bash script
+
+```
+hamming3_primes.sh
+```
+
+generates every candidate of exactly **N bits** having:
+
+- most significant bit = 1
+- least significant bit = 1
+- exactly one additional bit set
+
+therefore producing numbers with
+
+```
+Hamming weight = 3
+```
+
+Every candidate is tested for primality using OpenSSL.
+
+---
+
+## Requirements
+
+- Bash
+- OpenSSL
+- Linux, macOS or any Unix-like environment
+
+---
+
+## Usage
+
+```
 chmod +x hamming3_primes.sh
+
+./hamming3_primes.sh 1024
 ```
 
-### Usage
-```bash
-./hamming3_primes.sh <N>
+Example:
+
 ```
-Where `<N>` is the desired bit length of the primes to generate (integer ≥ 3).
-
-**Options:**
-- `-h`, `--help`: Display help message and exit
-
-### Example Outputs
-
-**8 bits**
-```text
-generando todos los numeros primos de 8 bits con exactamente 3 bits en 1 ...
-creando numero base
-base=10000001
-recorriendo todos los que tienen peso de hamming = 3 ...
-binario=11000001
-decimal=193
-binario=10001001
-decimal=137
-binario=10000011
-decimal=131
+./hamming3_primes.sh 4096
 ```
 
-**16 bits**
-```text
-generando todos los numeros primos de 16 bits con exactamente 3 bits en 1 ...
-creando numero base
-base=1000000000000001
-recorriendo todos los que tienen peso de hamming = 3 ...
-binario=1010000000000001
-decimal=40961
-binario=1000000001000001
-decimal=32833
-binario=1000000000100001
-decimal=32801
-binario=1000000000000011
-decimal=32771
+---
+
+## Example output
+
+```
+Primo #1 encontrado:
+
+Binary:
+1000...000100...0001
+
+Decimal:
+1046...
+
+...
 ```
 
-**32 bits**
-```text
-generando todos los numeros primos de 32 bits con exactamente 3 bits en 1 ...
-creando numero base
-base=10000000000000000000000000000001
-recorriendo todos los que tienen peso de hamming = 3 ...
-binario=11000000000000000000000000000001
-decimal=3221225473
-binario=10001000000000000000000000000001
-decimal=2281701377
-binario=10000000010000000000000000000001
-decimal=2151677953
-binario=10000000000000000000001000000001
-decimal=2147484161
-binario=10000000000000000000000010000001
-decimal=2147483777
-binario=10000000000000000000000001000001
-decimal=2147483713
+(The actual output depends on the requested bit length.)
+
+---
+
+## Research conclusions
+
+The experimental results indicate that:
+
+- Large Hamming-weight-3 prime exponents can be generated reliably.
+- They are mathematically valid RSA public exponents.
+- RSA encryption, decryption, signing and verification work correctly with them.
+- Their use significantly increases the computational cost of encryption and signature verification.
+- They provide no currently known security advantage over the conventional exponent 65537.
+- Compatibility with many existing software products is reduced because numerous implementations assume or expect conventional public exponents.
+
+---
+
+## Disclaimer
+
+This project does **not** recommend replacing the conventional RSA public exponent.
+
+Its purpose is solely to document an experimental investigation and provide reproducible research material.
+
+---
+
+## Citation
+
+If this work contributes to your own research, academic publication or implementation, citations are appreciated.
+
+---
+
+## Author
+
+**Israel González Delgado**
+
+GitHub:
+
+https://github.com/israelglezdelgado-lang
+
+Email:
+
+israelglezdelgado@gmail.com
+
+---
+
+# Español
+
+## Descripción
+
+Este repositorio contiene el material correspondiente a una investigación criptográfica experimental dedicada al estudio de **exponentes públicos RSA de gran tamaño con peso de Hamming igual a tres**.
+
+Durante décadas prácticamente todas las implementaciones de RSA han utilizado como exponente público
+
+```
+65537
 ```
 
-**64 bits**
-```text
-generando todos los numeros primos de 64 bits con exactamente 3 bits en 1 ...
-creando numero base
-base=1000000000000000000000000000000000000000000000000000000000000001
-recorriendo todos los que tienen peso de hamming = 3 ...
-binario=1000000000000000000000000000000000000000100000000000000000000001
-decimal=9223372036863164417
-binario=1000000000000000000000000000000000000000000010000000000000000001
-decimal=9223372036855300097
+un primo de Fermat con peso de Hamming igual a dos.
+
+El objetivo de este proyecto **no es sustituir dicho valor**, sino estudiar experimentalmente si exponentes mucho mayores, manteniendo un peso de Hamming muy bajo, pueden emplearse correctamente dentro del algoritmo RSA y cuáles son sus implicaciones prácticas.
+
+El proyecto incluye:
+
+- Un generador en Bash.
+- Metodología experimental.
+- Resultados estadísticos.
+- Discusión matemática.
+- Consideraciones de rendimiento.
+- Análisis de interoperabilidad.
+- Una disertación técnica bilingüe.
+
+Este proyecto tiene fines exclusivamente académicos, experimentales y educativos.
+
+---
+
+## Motivación
+
+La investigación parte de una observación sencilla.
+
+Hoy en día los módulos RSA suelen tener tamaños como:
+
+- 2048 bits
+- 3072 bits
+- 4096 bits
+
+mientras que el exponente público continúa siendo
+
+```
+65537
 ```
 
-**128 bits**
-```text
-generando todos los numeros primos de 128 bits con exactamente 3 bits en 1 ...
-creando numero base
-base=10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-recorriendo todos los que tienen peso de hamming = 3 ...
-binario=10000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-decimal=170141264590107646338368999504889249793
-binario=10000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-decimal=170141224025288439035028151610386677761
-binario=10000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-decimal=170141188531071632644604909702696927233
-binario=10000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-decimal=170141183470372752045970345915077099521
-binario=10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000001
-decimal=170141183460469231731687303715917660161
-binario=10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000001
-decimal=170141183460469231731687303715884105793
+que apenas ocupa 17 bits.
+
+Esto conduce naturalmente a la siguiente pregunta:
+
+> ¿Puede RSA funcionar correctamente utilizando exponentes públicos de miles de bits que mantengan un peso de Hamming muy reducido?
+
+Este proyecto intenta responder esa pregunta mediante experimentación.
+
+---
+
+## Contenido del repositorio
+
+```
+rsa-hamming3-exponents/
+│
+├── hamming3_primes.sh
+├── README.md
+├── documentation.html
+└── LICENSE
 ```
 
-**256 bits**
-```text
-generando todos los numeros primos de 256 bits con exactamente 3 bits en 1 ...
-creando numero base
-base=1000...0001 (256 bits)
-recorriendo todos los que tienen peso de hamming = 3 ...
-binario=1000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-decimal=57910179395176324786422158884349897274761612203995286971393764853566905778177
-binario=1000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-decimal=57896044834337671048990610861680074622792037721917437400053371852785446813697
-binario=10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-decimal=57896044618658097711785492597880058715812779097856111313570905261936247570433
-binario=1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000001
-decimal=57896044618658097711785492504343953926634992332820282019728792006155588075521
+---
+
+## El generador
+
+El script
+
+```
+hamming3_primes.sh
 ```
 
-**512 bits**
-```text
-generando todos los numeros primos de 512 bits con exactamente 3 bits en 1 ...
-creando numero base
-base=1000...0001 (512 bits)
-recorriendo todos los que tienen peso de hamming = 3 ...
-binario=10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-decimal=6703903964971298549787012499102923063739682910296196723857792318389072804996809122282878994734162608136414911905572727986124928595988056549427656871903233
-binario=10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-decimal=6703903964971298549787012499102923063739682910296196688870324670004565655366353575225615357541862531934442540173031191858165820309095847173308672850788353
-binario=10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-decimal=6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941560715789883889358865432577
-binario=10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000001
-decimal=6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216841682911233
-binario=10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000001
-decimal=6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503566337
+genera todos los candidatos de exactamente **N bits** que cumplen:
+
+- bit más significativo = 1
+- bit menos significativo = 1
+- un único bit adicional activado
+
+obteniendo números con
+
+```
+Peso de Hamming = 3
 ```
 
-**1024 bits**
-```text
-generando todos los numeros primos de 1024 bits con exactamente 3 bits en 1 ...
-creando numero base
-base=1000...0001 (1024 bits)
-recorriendo todos los que tienen peso de hamming = 3 ...
-binario=100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000......
-decimal=89884656743115795386465259539451236680898848947115329105934842379160102275947837535682792493188742607404027982304408601493867548109190057959561126590448365223510145756524156337069276444513250919817848141036575386902008003102642524276228423342001888580410750211207283765619813262028428106456046117286966198273
-binario=100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000......
-decimal=89884656743115795386465259539451236680898848947115328636715040578866337902750481566354238661203768010560056939935696678829394884407208311246423715319737062188883946712432742649507964867741904724559725974292573733694721601910576132635240917467902495353517807314028316522529334856154258250326708376290262515713
-binario=1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000......
-decimal=89884656743115795386465259539451236680898848947115328636715040578866337902750481566354238661203768010560056939935696678829394884407208311246423715319737062188883946712432742638151109800623047059726541476042502884419075341171231440737861180967580151358421903662673523400077294724440175058975940539873933393921
+Cada candidato es sometido posteriormente a una prueba de primalidad mediante OpenSSL.
+
+---
+
+## Requisitos
+
+- Bash
+- OpenSSL
+- Linux, macOS o cualquier sistema tipo Unix
+
+---
+
+## Uso
+
+```
+chmod +x hamming3_primes.sh
+
+./hamming3_primes.sh 1024
 ```
 
-### Experimental Results
-The following table summarizes the number of primes found for various bit lengths:
+Ejemplo:
 
-| Bit Length | Candidates (N−2) | Primes Found |
-|------------|------------------|--------------|
-| 8          | 6                | 3            |
-| 16         | 14               | 4            |
-| 32         | 30               | 6            |
-| 64         | 62               | 2            |
-| 128        | 126              | 6            |
-| 256        | 254              | 4            |
-| 512        | 510              | 5            |
-| 1024       | 1022             | 3            |
+```
+./hamming3_primes.sh 4096
+```
 
-The observed counts are statistically consistent with the Prime Number Theorem prediction: for large *N*, the expected number of primes among *N−2* candidates is approximately *1/ln(2) ≈ 1.44*.
+---
 
-### Theoretical Background
-For a prime of exactly *N* bits with Hamming weight 3:
-- The most significant bit is fixed to 1 (ensures *N*-bit length).
-- The least significant bit is fixed to 1 (ensures oddness, necessary for primality > 2).
-- The third active bit can be placed in any of the *N−2* intermediate positions.
-- Total candidates: *N − 2*.
+## Resultados generales
 
-Each candidate is tested for primality using OpenSSL's Miller–Rabin implementation.
+Los experimentos muestran que:
 
-### Security Considerations
-> ⚠️ **This project is intended for educational and experimental purposes.**
+- Es posible generar de forma sistemática exponentes primos de gran tamaño con peso de Hamming igual a tres.
+- Dichos exponentes son matemáticamente válidos para RSA.
+- Las operaciones de cifrado, descifrado, firma y verificación funcionan correctamente.
+- El coste computacional aumenta de forma considerable.
+- No existe evidencia pública de que proporcionen una ventaja de seguridad frente al valor estándar 65537.
+- La interoperabilidad con numerosas aplicaciones disminuye debido a que muchas implementaciones esperan exponentes públicos convencionales.
 
-- **Mathematical security**: The size of *e* does not contribute to RSA's resistance against factorization or quantum attacks (Shor's algorithm). Security depends on the modulus *n* size.
-- **Performance cost**: Exponents with Hamming weight 3 and large bit length increase encryption/verification cost by ~240× compared to `e = 65537`.
-- **Interoperability**: Non-standard exponents are rejected by FIPS-validated modules, standard-compliant applications (Adobe Acrobat, web browsers), and PKI infrastructure.
-- **Denial of Service**: The increased computational cost makes systems vulnerable to resource exhaustion attacks.
+---
 
-### Repository Structure
+## Aviso
+
+Este proyecto **no pretende proponer un nuevo estándar para RSA**.
+
+Su finalidad consiste únicamente en documentar una investigación experimental reproducible.
+
+---
+
+## Autor
+
+**Israel González Delgado**
+
+GitHub:
+
+https://github.com/israelglezdelgado-lang
+
+Correo electrónico:
+
+israelglezdelgado@gmail.com
+
+---
+
+# License
+
+MIT License
+
+Copyright (c) 2026 Israel González Delgado
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
